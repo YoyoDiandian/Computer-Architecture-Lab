@@ -19,24 +19,25 @@ module ucsbece154a_datapath (
     input        [31:0] readdata_i
 );
 
-`include "ucsbece154a_defines.vh"
-/// Your code here
+    `include "ucsbece154a_defines.vh"
+    /// Your code here
 
-// Use name "rf" for a register file module so testbench file work properly (or modify testbench file) 
- logic [31:0] PCNext, PCPlus4, PCTarget;
- logic [31:0] ImmExt;
- logic [31:0] SrcA, SrcB;
- logic [31:0] Result;
- // next PC logic
- flopr #(32)    pcreg(clk, reset, PCNext, pc_o);
- adder          pcadd4(pc_o, 32'd4, PCPlus4);
- adder          pcaddbranch(pc_o, ImmExt, PCTarget);
- mux2 #(32)     pcmux(PCPlus4, PCTarget, PCSrc_i, PCNext);
- // register file logic
- regfile        rf(clk, RegWrite_i, instr_i[19:15], instr_i[24:20], instr_i[11:7], Result, SrcA, WriteData);
- extend         ext(instr_i[31:7], ImmSrc_i, ImmExt);
- // ALU logic
- mux2 #(32)     srcbmux(writedata_o, ImmExt, ALUSrc_i, SrcB);
- alu            alu(SrcA, SrcB, ALUControl_i, aluresult_o, zero_o);
- mux3 #(32)     resultmux(aluresult_o, readdata_i, PCPlus4,ResultSrc_i, Result);
+    // Use name "rf" for a register file module so testbench file work properly (or modify testbench file) 
+    logic [31:0] PCNext, PCPlus4, PCTarget;
+    logic [31:0] ImmExt;
+    logic [31:0] SrcA, SrcB;
+    logic [31:0] Result;
+    // next PC logic
+    // flopr是一个带时钟的触发器模块，用于在时钟上升沿存储PCNext到 pc_o
+    flopr #(32)    pcreg(clk, reset, PCNext, pc_o);
+    adder          pcadd4(pc_o, 32'd4, PCPlus4);
+    adder          pcaddbranch(pc_o, ImmExt, PCTarget);
+    mux2 #(32)     pcmux(PCPlus4, PCTarget, PCSrc_i, PCNext);
+    // register file logic
+    regfile        rf(clk, RegWrite_i, instr_i[19:15], instr_i[24:20], instr_i[11:7], Result, SrcA, WriteData);
+    extend         ext(instr_i[31:7], ImmSrc_i, ImmExt);
+    // ALU logic
+    mux2 #(32)     srcbmux(writedata_o, ImmExt, ALUSrc_i, SrcB);
+    alu            alu(SrcA, SrcB, ALUControl_i, aluresult_o, zero_o);
+    mux3 #(32)     resultmux(aluresult_o, readdata_i, PCPlus4,ResultSrc_i, Result);
 endmodule
