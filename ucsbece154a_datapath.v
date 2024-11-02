@@ -23,10 +23,10 @@ module ucsbece154a_datapath (
     /// Your code here
 
     // Use name "rf" for a register file module so testbench file work properly (or modify testbench file) 
-    logic [31:0] PCNext, PCPlus4, PCTarget;
-    logic [31:0] ImmExt;
-    logic [31:0] SrcA, SrcB;
-    logic [31:0] Result;
+    reg [31:0] PCNext, PCPlus4, PCTarget;
+    reg [31:0] ImmExt;
+    reg [31:0] SrcA, SrcB;
+    reg [31:0] Result;
     // next PC logic
     // flopr是一个带时钟的触发器模块，用于在时钟上升沿存储PCNext到 pc_o
     flopr #(32)    pcreg(clk, reset, PCNext, pc_o);
