@@ -1,4 +1,4 @@
-echo "开始编译"
+echo "Start Compiling"
 iverilog -o wave \
             ./ucsbece154a_top.v \
             ./tb.v \
@@ -9,8 +9,8 @@ iverilog -o wave \
             ./ucsbece154a_datapath.v \
             ./ucsbece154a_alu.v \
             ./ucsbece154a_rf.v 
-echo "编译完成"
+echo "Compilation Completed"
 
-echo "生成波形文件"
+echo "Generate waveform files"
 vvp -n wave
 cp wave.vcd wave.lxt

@@ -28,7 +28,6 @@ module ucsbece154a_datapath (
     reg [31:0] Result;
 
     // next PC logic
-    // flopr #(32) pcreg(clk, reset, PCNext, pc_o);
     always @(posedge clk or posedge reset) begin
         if (reset)
             pc_o <= 0;
@@ -36,9 +35,6 @@ module ucsbece154a_datapath (
             pc_o <= PCNext;
     end
     assign PCPlus4 = pc_o + 32'd4;
-    // adder pcadd4(pc_o, 32'd4, PCPlus4);
-    // adder pcaddbranch(pc_o, ImmExt, PCTarget);
-    // mux2 #(32) pcmux(PCPlus4, PCTarget, PCSrc_i, PCNext);
     wire PCSrc;
     wire jump;
     assign PCTarget = PCSrc ? pc_o + ImmExt : 32'bx;
@@ -76,10 +72,8 @@ module ucsbece154a_datapath (
     end
 
     // ALU logic
-    // mux2 #(32) srcbmux(writedata_o, ImmExt, ALUSrc_i, SrcB);
     assign SrcB = ALUSrc_i ? ImmExt : writedata_o;
     ucsbece154a_alu alu(SrcA, SrcB, ALUControl_i, aluresult_o, zero_o);
-    // mux3 #(32) resultmux(aluresult_o, readdata_i, PCPlus4, ResultSrc_i, Result);
 
     always @(*) begin
         case (ResultSrc_i)

@@ -14,9 +14,6 @@ module ucsbece154a_rf (
 
 reg [31:0] MEM [0:31];
 
-// assign rd1_o = MEM[a1_i];
-// assign rd2_o = MEM[a2_i];
-
 assign rd1_o = (!a1_i) ? 32'b0 : MEM[a1_i];
 assign rd2_o = (!a2_i) ? 32'b0 : MEM[a2_i];
 
