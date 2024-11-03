@@ -25,7 +25,7 @@ module ucsbece154a_controller (
 // TO DO: Generate properly PCSrc by replacing all `z` values with the correct values
 
  wire branch, jump;
- assign PCSrc_o = 1'b0;
+ assign PCSrc_o = jump ? 1'b1 : 1'b0;
 
 
 //  TO DO: Implement main decoder 

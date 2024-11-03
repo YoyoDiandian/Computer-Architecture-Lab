@@ -23,7 +23,6 @@ module ucsbece154a_datapath (
     /// Your code here
     // Use name "rf" for a register file module so testbench file work properly (or modify testbench file) 
     wire [31:0] PCNext, PCPlus4, PCTarget;
-    wire [31:0] pc_o_temp;
     reg [31:0] ImmExt;
     wire [31:0] SrcA, SrcB;
     reg [31:0] Result;
@@ -38,10 +37,14 @@ module ucsbece154a_datapath (
     end
     assign PCPlus4 = pc_o + 32'd4;
     // adder pcadd4(pc_o, 32'd4, PCPlus4);
-    assign PCTarget = pc_o + ImmExt;
     // adder pcaddbranch(pc_o, ImmExt, PCTarget);
     // mux2 #(32) pcmux(PCPlus4, PCTarget, PCSrc_i, PCNext);
-    assign PCNext = PCSrc_i ? PCTarget : PCPlus4;
+    wire PCSrc;
+    wire jump;
+    assign PCTarget = PCSrc ? pc_o + ImmExt : 32'bx;
+    assign jump = (ImmSrc_i == 3'b010 & SrcA == SrcB);
+    assign PCSrc = jump ? 1 : PCSrc_i;
+    assign PCNext = PCSrc ? PCTarget : PCPlus4;
 
     // register file logic
     ucsbece154a_rf rf(
@@ -59,13 +62,13 @@ module ucsbece154a_datapath (
     always @(*) begin
         case (ImmSrc_i)
             // I-type
-            3'b000: ImmExt = {{20{instr_i[24]}}, instr_i[24:13]};
+            3'b000: ImmExt = {{20{instr_i[31]}}, instr_i[31:20]};
             // S-type (stores)
-            3'b001: ImmExt = {{20{instr_i[24]}}, instr_i[24:18], instr_i[4:0]};
+            3'b001: ImmExt = {{20{instr_i[31]}}, instr_i[31:25], instr_i[11:7]};
             // B-type (branches)
-            3'b010: ImmExt = {{20{instr_i[24]}}, instr_i[0], instr_i[23:18], instr_i[4:1], 1'b0};
+            3'b010: ImmExt = {{20{instr_i[31]}}, instr_i[7], instr_i[30:25], instr_i[11:8], 1'b0};
             // J-type (jal)
-            3'b011: ImmExt = {{12{instr_i[24]}}, instr_i[19:12], instr_i[20], instr_i[23:21], 1'b0};
+            3'b011: ImmExt = {{12{instr_i[31]}}, instr_i[31], instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
             default: ImmExt = 32'bx; // undefined
         endcase
     end
