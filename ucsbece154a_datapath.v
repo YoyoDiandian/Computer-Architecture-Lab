@@ -51,8 +51,8 @@ module ucsbece154a_datapath (
     ucsbece154a_rf rf (
         .clk(clk),
         .we3_i(RegWrite_i),
-        .a1_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op ? 5'b11111 : instr_i[19:15]),
-        .a2_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op || instr_i[6:0] == instr_ItypeALU_op ? 5'b11111 : instr_i[24:20]),
+        .a1_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op ? 5'b0 : instr_i[19:15]),
+        .a2_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op || instr_i[6:0] == instr_ItypeALU_op ? 5'b0 : instr_i[24:20]),
         .a3_i(instr_i[11:7]),
         .wd3_i(Result),
         .rd1_o(SrcA),
