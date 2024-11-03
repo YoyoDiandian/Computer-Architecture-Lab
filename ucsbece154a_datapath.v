@@ -51,8 +51,8 @@ module ucsbece154a_datapath (
     ucsbece154a_rf rf (
         .clk(clk),
         .we3_i(RegWrite_i),
-        .a1_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op ? 5'b1 : instr_i[19:15]),
-        .a2_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op || instr_i[6:0] == instr_ItypeALU_op ? 5'b1 : instr_i[24:20]),
+        .a1_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op ? 5'b11111 : instr_i[19:15]),
+        .a2_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op || instr_i[6:0] == instr_ItypeALU_op ? 5'b11111 : instr_i[24:20]),
         .a3_i(instr_i[11:7]),
         .wd3_i(Result),
         .rd1_o(SrcA),
@@ -69,6 +69,8 @@ module ucsbece154a_datapath (
             3'b010: ImmExt = {{20{instr_i[31]}}, instr_i[7], instr_i[30:25], instr_i[11:8], 1'b0};
             // J-type (jal)
             3'b011: ImmExt = {{12{instr_i[31]}}, instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
+            // U-type (lui)
+            3'b100: ImmExt = {{12{instr_i[31]}}, instr_i[30:12]};
             default: ImmExt = 32'bx; // undefined
         endcase
     end

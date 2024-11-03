@@ -17,8 +17,8 @@ reg [31:0] MEM [0:31];
 // assign rd1_o = MEM[a1_i];
 // assign rd2_o = MEM[a2_i];
 
-assign rd1_o = a1_i == 5'b1 ? 32'b0 : MEM[a1_i];
-assign rd2_o = a2_i == 5'b1 ? 32'b0 : MEM[a2_i];
+assign rd1_o = a1_i == 5'b11111 ? 32'b0 : MEM[a1_i];
+assign rd2_o = a2_i == 5'b11111 ? 32'b0 : MEM[a2_i];
 
 
 initial MEM[0] = 32'b0;
