@@ -68,7 +68,7 @@ module ucsbece154a_datapath (
             // B-type (branches)
             3'b010: ImmExt = {{20{instr_i[31]}}, instr_i[7], instr_i[30:25], instr_i[11:8], 1'b0};
             // J-type (jal)
-            3'b011: ImmExt = {{12{instr_i[31]}}, instr_i[31], instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
+            3'b011: ImmExt = {{12{instr_i[31]}}, instr_i[19:12], instr_i[20], instr_i[30:21], 1'b0};
             default: ImmExt = 32'bx; // undefined
         endcase
     end

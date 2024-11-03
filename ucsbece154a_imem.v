@@ -9,7 +9,7 @@ module ucsbece154a_imem (
     output wire  [31:0] rd_o
 );
 
-localparam NUM_WORDS = 64;
+localparam NUM_WORDS = 23;
 localparam ADDR_WIDTH = $clog2(NUM_WORDS);
 
 reg [31:0] RAM [0:NUM_WORDS-1];
