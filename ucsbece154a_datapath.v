@@ -47,17 +47,17 @@ module ucsbece154a_datapath (
     assign PCNext = PCSrc ? PCTarget : PCPlus4;
 
     // register file logic
-    ucsbece154a_rf rf(
+    reg a1[4:0], a2[4:0];
+    ucsbece154a_rf rf (
         .clk(clk),
         .we3_i(RegWrite_i),
-        .a1_i(instr_i[19:15]),
-        .a2_i(instr_i[24:20]),
+        .a1_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op ? 5'b1 : instr_i[19:15]),
+        .a2_i(instr_i[6:0] == instr_lui_op || instr_i[6:0] == instr_jal_op || instr_i[6:0] == instr_ItypeALU_op ? 5'b1 : instr_i[24:20]),
         .a3_i(instr_i[11:7]),
         .wd3_i(Result),
         .rd1_o(SrcA),
         .rd2_o(writedata_o)
     );
-    // extend ext(instr_i[31:7], ImmSrc_i, ImmExt);
 
     always @(*) begin
         case (ImmSrc_i)
