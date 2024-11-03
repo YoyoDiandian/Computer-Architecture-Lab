@@ -1,7 +1,7 @@
 echo "开始编译"
 iverilog -o wave \
             ./ucsbece154a_top.v \
-            ./ucsbece154a_top_tb.v \
+            ./testbench.v \
             ./ucsbece154a_riscv.v \
             ./ucsbece154a_imem.v \
             ./ucsbece154a_dmem.v \

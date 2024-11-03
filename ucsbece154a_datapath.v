@@ -13,7 +13,7 @@ module ucsbece154a_datapath (
     input         [1:0] ResultSrc_i,
     input         [2:0] ALUControl_i,
     output              zero_o,
-    output reg   [31:0] pc_o,
+    output wire   [31:0] pc_o,
     input        [31:0] instr_i,
     output wire  [31:0] aluresult_o, writedata_o,
     input        [31:0] readdata_i
@@ -29,26 +29,26 @@ module ucsbece154a_datapath (
     wire [31:0] Result;
 
     // next PC logic
-    flopr #(32) pcreg(clk, reset, PCNext, pc_o_temp);
+    flopr #(32) pcreg(clk, reset, PCNext, pc_o);
     adder pcadd4(pc_o, 32'd4, PCPlus4);
     adder pcaddbranch(pc_o, ImmExt, PCTarget);
     mux2 #(32) pcmux(PCPlus4, PCTarget, PCSrc_i, PCNext);
 
-    always @(posedge clk or posedge reset) begin
-        if (reset) begin
-            pc_o <= 32'b0; // 或根据需求重置
-        end else begin
-            pc_o <= pc_o_temp; // 将临时值赋给 pc_o
-        end
-    end
+    // always @(posedge clk or posedge reset) begin
+    //     if (reset) begin
+    //         pc_o <= 32'b0; // 或根据需求重置
+    //     end else begin
+    //         pc_o <= pc_o_temp; // 将临时值赋给 pc_o
+    //     end
+    // end
 
     // register file logic
     regfile rf(
         .clk(clk),
         .we3(RegWrite_i),
-        .a1(instr_i[19:15]),
-        .a2(instr_i[24:20]),
-        .a3(instr_i[11:7]),
+        .input1(instr_i[19:15]),
+        .input2(instr_i[24:20]),
+        .input3(instr_i[11:7]),
         .wd3(Result),
         .rd1(SrcA),
         .rd2(writedata_o)
@@ -57,46 +57,8 @@ module ucsbece154a_datapath (
 
     // ALU logic
     mux2 #(32) srcbmux(writedata_o, ImmExt, ALUSrc_i, SrcB);
-    alu alu(SrcA, SrcB, ALUControl_i, aluresult_o, zero_o);
+    ucsbece154a_alu alu(SrcA, SrcB, ALUControl_i, aluresult_o, zero_o);
     mux3 #(32) resultmux(aluresult_o, readdata_i, PCPlus4, ResultSrc_i, Result);
-endmodule
-
-module alu(
-    input   [31:0]  a, b,
-    input   [2:0]   f,
-    output  reg [31:0] result,
-    output  reg zero
-);
-
-    wire [32:0] sum;
-
-    assign sum = {1'b0, a} + (f == 3'b001 ? ~{1'b0, b} + 1'b1 : {1'b0, b});
-
-    always @(*) begin
-        
-        case(f)
-            3'b000: begin
-                result = sum[31:0];
-            end
-            3'b001: begin
-                result = sum[31:0];
-            end
-            3'b010: begin
-                result = a & b;
-            end
-            3'b011: begin
-                result = a | b;
-            end
-            3'b101: begin
-                result = ($signed(a) < $signed(b)) ? 32'b1 : 32'b0;
-            end
-            default: begin
-                result = 32'b0;
-            end
-        endcase
-
-        assign zero = (result == 32'b0) ? 1'b1 : 1'b0;
-    end
 endmodule
 
 
@@ -107,51 +69,67 @@ module adder(
     assign y = a + b;
 endmodule
 
-// module regfile (
-//     input clk,
-//     input we3,
-//     input [4:0] a1, a2, a3,  // 注意Verilog中为[4:0]而不是[5:0]
-//     input [31:0] wd3,
-//     output [31:0] rd1, rd2
-// );
-//     reg [31:0] rf[31:0];
-//     // 三端口寄存器文件
-//     // A1和A2端口用于组合读（读取rd1和rd2），A3端口用于写入
-//     // 寄存器0硬连为0
-//     always @(posedge clk) begin
-//         if (we3) rf[a3] <= wd3;
-//     end
-//     assign rd1 = (a1 != 0) ? rf[a1] : 32'b0;
-//     assign rd2 = (a2 != 0) ? rf[a2] : 32'b0;
-// endmodule
-
 module regfile (
     input clk,
     input we3,           // Write enable
-    input [4:0] a1, a2, a3, // Address inputs
+    input [4:0] input1, input2, input3, // Address inputs
     input [31:0] wd3,   // Write data input
-    output reg [31:0] rd1, rd2 // Read data outputs
+    output wire [31:0] rd1, rd2 // Read data outputs
 );
-    // 定义32个32位寄存器
-    reg [31:0] rf[31:0];
-    reg [31:0] zero;
+    reg [31:0] rf [0:31]; // Register file array
 
-    // 读寄存器
-    always @(*) begin
-        rd1 = (a1 != 5'b0) ? rf[a1] : 32'b0; // a1为0时，rd1返回0
-        rd2 = (a2 != 5'b0) ? rf[a2] : 32'b0; // a2为0时，rd2返回0
-    end
+    wire [31:0] zero, ra, sp, gp, tp, t0, t1, t2;
+    wire [31:0] s0, s1, a0, a1, a2, a3, a4, a5, a6, a7;
+    wire [31:0] s2, s3, s4, s5, s6, s7, s8, s9, s10, s11;
+    wire [31:0] t3, t4, t5, t6;
 
-    // 写寄存器
+    // initialize register 0 to always be 0
+    initial rf[0] = 0;
+
+    // Write operation
     always @(posedge clk) begin
-        if (we3 && (a3 != 5'b0)) rf[a3] <= wd3; // a3为0时不写入
+        if (we3) begin
+            rf[input3] <= wd3;
+        end
     end
 
-    // 在初始化时，可以将特定寄存器赋值，或者在仿真中添加初始值
-    initial begin
-        rf[0] = 32'b0; // zero寄存器初始化为0
-        // 其他寄存器可以初始化为任意值，如果需要的话
-    end
+    // Read operation
+    assign rd1 = (input1 != 0) ? rf[input1] : 0;
+    assign rd2 = (input2 != 0) ? rf[input2] : 0;
+
+    // Define outputs for each register
+    assign zero = rf[0];
+    assign ra = rf[1];
+    assign sp = rf[2];
+    assign gp = rf[3];
+    assign tp = rf[4];
+    assign t0 = rf[5];
+    assign t1 = rf[6];
+    assign t2 = rf[7];
+    assign s0 = rf[8];
+    assign s1 = rf[9];
+    assign a0 = rf[10];
+    assign a1 = rf[11];
+    assign a2 = rf[12];
+    assign a3 = rf[13];
+    assign a4 = rf[14];
+    assign a5 = rf[15];
+    assign a6 = rf[16];
+    assign a7 = rf[17];
+    assign s2 = rf[18];
+    assign s3 = rf[19];
+    assign s4 = rf[20];
+    assign s5 = rf[21];
+    assign s6 = rf[22];
+    assign s7 = rf[23];
+    assign s8 = rf[24];
+    assign s9 = rf[25];
+    assign s10 = rf[26];
+    assign s11 = rf[27];
+    assign t3 = rf[28];
+    assign t4 = rf[29];
+    assign t5 = rf[30];
+    assign t6 = rf[31];
 endmodule
 
 module flopr #(parameter WIDTH = 32) (
