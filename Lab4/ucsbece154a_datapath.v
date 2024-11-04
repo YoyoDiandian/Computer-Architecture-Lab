@@ -43,7 +43,6 @@ module ucsbece154a_datapath (
     assign PCNext = PCSrc ? PCTarget : PCPlus4;
 
     // register file logic
-    reg a1[4:0], a2[4:0];
     ucsbece154a_rf rf (
         .clk(clk),
         .we3_i(RegWrite_i),
