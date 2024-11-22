@@ -4,9 +4,7 @@
 // Distribution Prohibited
 
 
-`define SIM
-
-`define ASSERT(CONDITION, MESSAGE) if ((CONDITION)==1'b1); else begin $error($sformatf MESSAGE); end
+`define ASSERT(CONDITION, MESSAGE) if ((CONDITION)==1'b1); else begin $display($sformatf("Error: %s", $sformatf MESSAGE)); end
 
 module ucsbece154a_top_tb ();
 
@@ -51,36 +49,48 @@ wire [31:0] reg_t3 = top.riscv.dp.rf.t3;
 wire [31:0] reg_t4 = top.riscv.dp.rf.t4;
 wire [31:0] reg_t5 = top.riscv.dp.rf.t5;
 wire [31:0] reg_t6 = top.riscv.dp.rf.t6;
+
+wire [31:0] MEM_10000000 = top.mem.DATA[6'd0];
+wire [31:0] MEM_10000004 = top.mem.DATA[6'd1];
+wire [31:0] MEM_10000008 = top.mem.DATA[6'd2];
+wire [31:0] MEM_1000000c = top.mem.DATA[6'd3];
+wire [31:0] MEM_10000060 = top.mem.DATA[6'd24];
+wire [31:0] MEM_10000064 = top.mem.DATA[6'd25];
+wire [31:0] MEM_10000068 = top.mem.DATA[6'd26];
+wire [31:0] MEM_1000006C = top.mem.DATA[6'd27];
+wire [31:0] MEM_10000070 = top.mem.DATA[6'd28];
+
+
 //
 
-initial begin
-    $dumpfile("wave.vcd");
-    $dumpvars(0, ucsbece154a_top_tb);
-end
-
-integer i;
+reg [31:0] i;
+reg [31:0] cycle;
+always @(posedge clk) cycle = cycle+1;
 initial begin
 $display( "Begin simulation." );
 //\\ =========================== \\//
 
-reset = 1;
+reset = 0;
 @(negedge clk);
+reset = 1;
+cycle = 0;
 @(negedge clk);
 reset = 0;
 
-// Test for program
-for (i = 0; i < 20; i=i+1)
+// Change number of cycles if needed
+for (i = 0; i < 100; i=i+1)
     @(negedge clk);
 
 `ASSERT(reg_zero==32'b0, ("reg_zero incorrect"));
 `ASSERT(reg_sp==32'hBEEF000, ("reg_sp incorrect"));
-`ASSERT(reg_gp==32'h44, ("reg_gp incorrect"));
+`ASSERT(reg_gp==32'h1000004C, ("reg_gp incorrect"));
 `ASSERT(reg_tp==32'h1, ("reg_tp incorrect"));
 `ASSERT(reg_t0==32'hb, ("reg_t0 incorrect"));
 `ASSERT(reg_t2==32'h7, ("reg_t2 incorrect"));
-`ASSERT(top.dmem.RAM[24]==32'h7, ("dmem.RAM[24] incorrect"));
-`ASSERT(top.dmem.RAM[25]==32'h19, ("dmem.RAM[25] incorrect"));
-`ASSERT(top.dmem.RAM[26]==32'hBEEF000, ("dmem.RAM[26] incorrect"));
+`ASSERT(MEM_10000060==32'h7, ("mem.DATA[25] incorrect"));
+`ASSERT(MEM_1000006C==32'h19, ("mem.DATA[28] incorrect"));
+`ASSERT(MEM_10000070==32'hBEEF000, ("mem.DATA[29] //incorrect"));
+
 
 //\\ =========================== \\//
 $display( "End simulation.");
@@ -88,5 +98,3 @@ $stop;
 end
 
 endmodule
-
-`undef ASSERT

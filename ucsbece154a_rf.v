@@ -17,7 +17,6 @@ reg [31:0] MEM [0:31];
 assign rd1_o = MEM[a1_i];
 assign rd2_o = MEM[a2_i];
 
-
 initial MEM[0] = 32'b0;
 
 always @ (posedge clk) begin
