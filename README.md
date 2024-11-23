@@ -1,4 +1,3 @@
-
 # RISC-V Multicycle CPU Starter Code
 
 ## Guide to Run ECI ModelSim

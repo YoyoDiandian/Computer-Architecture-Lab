@@ -66,19 +66,71 @@ end
 
 // **PUT THE REST OF YOUR CODE HERE**
 
+reg [31:0] SrcA, SrcB, ImmExt;
 ucsbece154a_rf rf (
     /*FILL*/
+    .clk(clk),
+    .a1_i(a1),
+    .a2_i(a2),
+    .a3_i(a3),
+    .rd1_o(rd1),
+    .rd2_o(rd2),
+    .we3_i(RegWrite_i),
+    .wd3_i(Result)
 );
 
 ucsbece154a_alu alu (
     /*FILL*/
+    .a_i(SrcA),
+    .b_i(SrcB),
+    .alucontrol_i(ALUControl_i),
+    .result_o(ALUResult),
+    .zero_o(zero_o)
 );
 
 // Extend unit block
    /* FILL */
-
+always @(*) begin
+        case (ImmSrc_i)
+            // I-type
+            3'b000: ImmExt = {{20{Instr[31]}}, Instr[31:20]};
+            // S-type (stores)
+            3'b001: ImmExt = {{20{Instr[31]}}, Instr[31:25], Instr[11:7]};
+            // B-type (branches)
+            3'b010: ImmExt = {{20{Instr[31]}}, Instr[7], Instr[30:25], Instr[11:8], 1'b0};
+            // J-type (jal)
+            3'b011: ImmExt = {{12{Instr[31]}}, Instr[19:12], Instr[20], Instr[30:21], 1'b0};
+            // U-type (lui)
+            3'b100: ImmExt = {Instr[31:12], 12'b0};
+            default: ImmExt = 32'bx; // undefined
+        endcase
+    end
 // Muxes
    /* FILL */
+assign funct3_o = Instr[14:12];
+assign funct7_o = Instr[30];
+assign WriteData_o = rd2;
+assign op_o = Instr[6:0];
+assign Adr_o = AdrSrc_i ? Result : PC;
+
+    always @(*) begin
+        case (ALUSrcA_i)
+            2'b00: SrcA = PC;
+            2'b01: SrcA = OldPC;
+            2'b10: SrcA = A;
+        endcase
+        case (ALUSrcB_i)
+            2'b00: SrcB = B;
+            2'b01: SrcB = ImmExt;
+            2'b10: SrcB = 32'b100;
+        endcase
+        case (ResultSrc_i)
+            2'b00: Result = ALUout;
+            2'b01: Result = Data;
+            2'b10: Result = ALUResult;
+            default: Result = ALUResult;
+        endcase
+    end    
  
 
 endmodule
