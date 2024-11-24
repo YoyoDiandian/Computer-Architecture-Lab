@@ -97,7 +97,7 @@ module ucsbece154a_controller (
             instr_Rtype_op:    state_next = 4'b0110;  
             instr_beq_op:      state_next = 4'b1010;  
             instr_ItypeALU_op: state_next = 4'b1000;  
-            instr_lui_op:      state_next = 4'bzzzz;  
+            instr_lui_op:      state_next = 4'b1011;  
             instr_jal_op:      state_next = 4'b1001;  
             default:           state_next = 4'bxxxx;
           endcase
@@ -109,7 +109,7 @@ module ucsbece154a_controller (
             default:           state_next = 4'bxxxx;
           endcase
         end
-        state_MemRead:         state_next = 4'b0010;  
+        state_MemRead:         state_next = 4'b0100;  
         state_MemWB:           state_next = 4'b0000;  
         state_MemWrite:        state_next = 4'b0000;  
         state_ExecuteR:        state_next = 4'b0111;  
@@ -117,7 +117,7 @@ module ucsbece154a_controller (
         state_ExecuteI:        state_next = 4'b0111;  
         state_JAL:             state_next = 4'b0111;  
         state_BEQ:             state_next = 4'b0000;  
-        state_LUI:             state_next = 4'bzzzz;     
+        state_LUI:             state_next = 4'b0111;     
         default:               state_next = 4'bxxxx;
      endcase
    end
@@ -147,7 +147,7 @@ module ucsbece154a_controller (
         state_ExecuteI:  controls_next = 14'b0_0_0_0_0_10_01_x_xx_10;   
         state_JAL:       controls_next = 14'b1_0_0_0_1_01_10_x_00_00; 
         state_BEQ:       controls_next = 14'b0_1_0_0_0_10_00_x_00_01; 
-        state_LUI:       controls_next = 14'bz_z_z_z_z_zz_zz_z_zz_zz; 
+        state_LUI:       controls_next = 14'b0_0_0_0_0_xx_01_x_00_00; 
 	default:         controls_next = 14'bx_x_x_x_x_xx_xx_x_xx_xx;
    endcase
  end
