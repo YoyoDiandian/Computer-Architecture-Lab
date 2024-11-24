@@ -85,8 +85,7 @@ reset = 0;
 // Change number of cycles if needed
 for (i = 0; i < 100; i=i+1)
     @(negedge clk);
-    cycle = cycle + 1'b1
-$display(reg_zero);
+
 `ASSERT(reg_zero==32'b0, ("reg_zero incorrect"));
 `ASSERT(reg_sp==32'hBEEF000, ("reg_sp incorrect"));
 `ASSERT(reg_gp==32'h1000004C, ("reg_gp incorrect"));
