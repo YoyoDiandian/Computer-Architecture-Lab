@@ -130,7 +130,7 @@ assign Adr_o = AdrSrc_i ? Result : PC;
             2'b00: Result = ALUout;
             2'b01: Result = Data;
             2'b10: Result = ALUResult;
-            2'b11: Result = ImmExt
+            2'b11: Result = ImmExt;
             default: Result = 32'hxxxxxxxx;
         endcase
     end    
