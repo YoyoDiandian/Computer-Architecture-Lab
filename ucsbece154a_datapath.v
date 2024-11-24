@@ -118,19 +118,20 @@ assign Adr_o = AdrSrc_i ? Result : PC;
             2'b00: SrcA = PC;
             2'b01: SrcA = OldPC;
             2'b10: SrcA = A;
-            default: SrcA = 32'b0;
+            default: SrcA = 32'hxxxxxxxx;
         endcase
         case (ALUSrcB_i)
             2'b00: SrcB = B;
             2'b01: SrcB = ImmExt;
             2'b10: SrcB = 32'b100;
-            default: SrcB = 32'bx;
+            default: SrcB = 32'hxxxxxxxx;
         endcase
         case (ResultSrc_i)
             2'b00: Result = ALUout;
             2'b01: Result = Data;
             2'b10: Result = ALUResult;
-            default: Result = ALUResult;
+            2'b11: Result = ImmExt
+            default: Result = 32'hxxxxxxxx;
         endcase
     end    
  
