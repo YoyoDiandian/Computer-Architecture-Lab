@@ -117,7 +117,7 @@ module ucsbece154a_controller (
         state_ExecuteI:        state_next = 4'b0111;  
         state_JAL:             state_next = 4'b0111;  
         state_BEQ:             state_next = 4'b0000;  
-        state_LUI:             state_next = 4'b0111;     
+        state_LUI:             state_next = 4'b0000;     
         default:               state_next = 4'bxxxx;
      endcase
    end
@@ -147,7 +147,7 @@ module ucsbece154a_controller (
         state_ExecuteI:  controls_next = 14'b0_0_0_0_0_10_01_x_xx_10;   
         state_JAL:       controls_next = 14'b1_0_0_0_0_01_10_x_00_00; 
         state_BEQ:       controls_next = 14'b0_1_0_0_0_10_00_x_00_01; 
-        state_LUI:       controls_next = 14'b0_0_0_0_0_xx_01_x_11_00; 
+        state_LUI:       controls_next = 14'b0_0_0_0_1_xx_xx_x_11_xx; 
 	default:         controls_next = 14'bx_x_x_x_x_xx_xx_x_xx_xx;
    endcase
  end
