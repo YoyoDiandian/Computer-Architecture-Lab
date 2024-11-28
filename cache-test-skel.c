@@ -29,8 +29,22 @@ mystery2:
 */
 int get_cache_size(int block_size) {
   /* YOUR CODE GOES HERE */
-  
-  return -1;
+  int size = block_size; // 起始猜测大小为块大小
+  flush_cache(); // 刷新缓存
+
+  while (1) {
+    for (int i = 0; i < size; i += block_size) {
+      access_cache(i); // 访问地址
+    }
+    // 检查缓存命中
+    if (!access_cache(0)) { // 如果缓存未命中，则超出缓存大小
+      break;
+    }
+    size *= 2; // 缓存大小通常是 2 的幂，翻倍测试
+    flush_cache();
+  }
+
+  return size;
 }
 
 /*
@@ -38,7 +52,22 @@ int get_cache_size(int block_size) {
 */
 int get_cache_assoc(int size) {
   /* YOUR CODE GOES HERE */
-  return -1;
+  int assoc = 1; // 假设相联度至少为1
+  flush_cache();
+
+  while (1) {
+    for (int i = 0; i < assoc * size; i += size) {
+      access_cache(i); // 访问每组的不同块
+    }
+    // 检查缓存命中
+    if (!access_cache(0)) { // 如果缓存未命中，则相联度超出
+      break;
+    }
+    assoc++; // 增加猜测的相联度
+    flush_cache();
+  }
+
+  return assoc;
 }
 
 /*
@@ -46,7 +75,17 @@ int get_cache_assoc(int size) {
 */
 int get_block_size() {
   /* YOUR CODE GOES HERE */
-  return -1;
+  int block_size = 1;
+  flush_cache();
+  while (1) {
+    access_cache(0); // 访问基地址
+    if (!access_cache(block_size)) { // 增加步幅后检查命中
+      break;
+    }
+    block_size *= 2; // 块大小通常是 2 的幂
+    flush_cache();
+  }
+  return block_size;
 }
 
 int main(void) {
